@@ -12,6 +12,13 @@ $(document).ready(() => {
 
     getPokemonAutoComplete()
 
+    setSearchEvent()
+})
+
+function setSearchEvent() {
+    let pokemon1 = $('#pokemon1')
+    let pokemon2 = $('#pokemon2')
+
     $('.pokemonSearch input').typeahead({
         menu: '<ul class="typeahead dropdown-menu dropdown-menu-scroll" role="listbox"></ul>',
         item: '<li><a class="dropdown-item" href="#" role="option"></a></li>',
@@ -33,6 +40,13 @@ $(document).ready(() => {
         }
     })
 
+    // Retiré le focus quand la touche entré est pressé
+    $('.pokemonSearch input').on('keypress', (e) => {
+        if(e.which === 13) {
+            $(e.currentTarget).blur()
+        }
+    })
+
     let timeoutPk1
     $('#pokemon1 input').on('focusout', (e) => {
         clearTimeout(timeoutPk1)
@@ -50,7 +64,7 @@ $(document).ready(() => {
             searchPokemon(pokemon2, current.val(), 2)
         }, 100)
     })
-})
+}
 
 function searchPokemon(container, pokemon, compare_part) {
     container.find('.error-input').html('')
@@ -98,6 +112,22 @@ function searchPokemon(container, pokemon, compare_part) {
             // Attaques du Pokémon
             response.data.moves.forEach(move => {
                 template.find('.pokemonResultMoves').append(`<span>${move.move.name}</span>`)
+            })
+
+            // Bouton Supprimer
+            template.find('.pokemonResultRemove').on('click', () => {
+                let templateSearchPokemon = $('#TemplatePokemonSearch').html()
+
+                if(compare_part === 1) {
+                    poke1 = {}
+                }
+                else if(compare_part === 2) {
+                    poke2 = {}
+                }
+
+                container.html(templateSearchPokemon)
+                setSearchEvent()
+                actuPokemonStats()
             })
 
             container.html(template)

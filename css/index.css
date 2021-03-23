@@ -118,6 +118,14 @@ main {
     overflow-y: auto;
 }
 
+.pokemonResultRemove {
+    grid-column: 1/-1;
+    width: 40%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10px;
+}
+
 .low_stat {
     color: #FC2424;
 }
