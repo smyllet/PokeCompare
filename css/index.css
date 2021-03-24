@@ -28,12 +28,11 @@ main {
 
     display: grid;
     grid-template-columns: 1fr min-content 1fr;
-    grid-template-rows: minmax(auto, 90%) min-content;
+    grid-template-rows: auto min-content;
 }
 
-#filtre {
-    border-top: 2px solid white;
-    grid-column: 1/-1;
+#pokemon1, #pokemon2 {
+    overflow-y: auto;
 }
 
 .vertical-hr {
@@ -64,13 +63,13 @@ main {
 .pokemonSearch {
     padding-left: 15px;
     padding-right: 15px;
+    padding-top: 35%;
     justify-items: center;
     height: 100%;
     text-align: center;
 }
 
 .pokemonSearch .form-group {
-    margin-top: 35%;
     height: min-content;
     width: 60%;
     margin-left: auto;
@@ -84,8 +83,6 @@ main {
     grid-template-columns: repeat(2, 1fr);
     grid-auto-rows: max-content;
     gap: 10px;
-    height: 100%;
-    overflow-y: auto;
 }
 
 .pokemonResultIdentity {
@@ -138,14 +135,23 @@ main {
     display: grid;
     height: 40vh;
     overflow-y: auto;
+    grid-auto-rows: min-content;
     gap: 5px;
+}
+
+.pokemonResultMovesNB {
+    text-decoration: initial;
+    font-weight: normal;
+    font-size: large;
+    float: right;
 }
 
 .pokemonResultRemove {
     grid-column: 1/-1;
     width: 40%;
-    margin: 10px auto;
-
+    margin-top: 10px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .pokemonResultMoveDiv {
@@ -200,6 +206,29 @@ main {
 
 .same_stat {
     color: #244C9C;
+}
+
+/* Filtres */
+#filtre {
+    border-top: 2px solid white;
+    grid-column: 1/-1;
+}
+
+#filtreAttaques {
+    width: max-content;
+    padding: 10px 20px;
+    height: min-content;
+    border-left: 2px solid white;
+    border-right: 2px solid white;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: min-content;
+    text-align: center;
+}
+
+#filtreAttaques h5, #filtreAttaques input {
+    grid-column: 1/-1;
 }
 
 /* Pokemon Type Span */

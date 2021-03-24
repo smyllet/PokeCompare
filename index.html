@@ -38,7 +38,12 @@
             <!-- Second Pokémon à comparer -->
         </div>
         <div id="filtre">
-            <h1>Filtres</h1>
+            <div id="filtreAttaques">
+                <h5>Filtres Attaques</h5>
+                <label><input id="filtreAttaquesSameAttack" type="checkbox" checked> Attaque en commun</label>
+                <label><input id="filtreAttaquesDifAttack" type="checkbox" checked> Attaque unique</label>
+                <input id="filtreAttaquesSearch" type="text" placeholder="Recherche" class="form-control">
+            </div>
         </div>
     </main>
 </body>
@@ -82,7 +87,7 @@
             </div>
         </div>
         <div class="pokemonResultAttaqueDiv">
-            <h4>Attaques</h4>
+            <h4>Attaques <span class="pokemonResultMovesNB"></span></h4>
             <div class="pokemonResultMoves pokemonResultDataContainer">
             </div>
         </div>

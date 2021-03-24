@@ -13,6 +13,14 @@ $(document).ready(() => {
     getPokemonAutoComplete()
 
     setSearchEvent()
+
+    $('#filtreAttaques input[type=checkbox]').on('change', () => {
+        updatePokemonMoves()
+    })
+
+    $('#filtreAttaques input[type=text]').on('input', () => {
+        updatePokemonMoves()
+    })
 })
 
 function setSearchEvent() {
@@ -123,12 +131,13 @@ function searchPokemon(container, pokemon, compare_part) {
                 container.html(templateSearchPokemon)
                 setSearchEvent()
                 actuPokemonStats()
+                updatePokemonMoves()
             })
 
             container.html(template)
 
             actuPokemonStats()
-            setPokemonMoves(container, response.data.moves)
+            updatePokemonMoves()
         }).catch((error) => {
             container.find('.error-input').html('Pokémon introuvable')
         })
@@ -203,8 +212,34 @@ function updateAStat(statClass, stat1, stat2) {
     }
 }
 
+function updatePokemonMoves() {
+    let pokemon1 = $('#pokemon1')
+    let pokemon2 = $('#pokemon2')
+
+    if(poke1.moves) setPokemonMoves(pokemon1, poke1.moves)
+    if(poke2.moves) setPokemonMoves(pokemon2, poke2.moves)
+}
+
 function setPokemonMoves(container, moves) {
-    moves.forEach(move => {
+    let movesFiltered
+
+    movesFiltered = moves.filter(move => {
+        let valide = true
+
+        let search = $('#filtreAttaquesSearch').val().toLowerCase()
+
+        if((search.length > 0) && !move.move.name.toLowerCase().includes(search)) valide = false
+        else if(poke1.moves && poke2.moves) {
+            if(!$('#filtreAttaquesSameAttack').prop('checked') && poke1.moves.find(m => m.move.name === move.move.name) && poke2.moves.find(m => m.move.name === move.move.name)) valide = false
+            else if(!$('#filtreAttaquesDifAttack').prop('checked') && !(poke1.moves.find(m => m.move.name === move.move.name) && poke2.moves.find(m => m.move.name === move.move.name))) valide = false
+        }
+
+        return valide
+    })
+
+    container.find('.pokemonResultMoves').html('')
+
+    movesFiltered.forEach(move => {
         let template = $($('#TemplatePokemonResultMoveDiv').html())
         template.find('.pokemonResultMoveShortName').html(move.move.name)
 
@@ -236,4 +271,6 @@ function setPokemonMoves(container, moves) {
 
         container.find('.pokemonResultMoves').append(template)
     })
+
+    container.find('.pokemonResultMovesNB').html(`(${movesFiltered.length}/${moves.length})`)
 }
