@@ -4,6 +4,8 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
+    height: 100%;
+    width: 100%;
     overflow: hidden;
 }
 
@@ -18,6 +20,7 @@ main {
     bottom: 0;
     left: 0;
     right: 0;
+    max-height: 100%;
     overflow: hidden;
 
     background-color: #282828;
@@ -25,7 +28,7 @@ main {
 
     display: grid;
     grid-template-columns: 1fr min-content 1fr;
-    grid-auto-rows: auto min-content;
+    grid-template-rows: minmax(auto, 90%) min-content;
 }
 
 #filtre {
@@ -38,6 +41,23 @@ main {
     height: 100%;
     width: 2px;
     background-color: white;
+}
+
+/* Custom Scrollbar */
+*::-webkit-scrollbar {
+    width: 5px;
+}
+
+*::-webkit-scrollbar-track {
+    background: rgba(228, 45, 61,0.1);
+}
+
+*::-webkit-scrollbar-thumb {
+    background: rgba(228, 45, 61,0.7);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: rgba(228, 45, 61,0.9);
 }
 
 /* Recherche Pokémon */
@@ -64,6 +84,8 @@ main {
     grid-template-columns: repeat(2, 1fr);
     grid-auto-rows: max-content;
     gap: 10px;
+    height: 100%;
+    overflow-y: auto;
 }
 
 .pokemonResultIdentity {
@@ -116,14 +138,56 @@ main {
     display: grid;
     height: 40vh;
     overflow-y: auto;
+    gap: 5px;
 }
 
 .pokemonResultRemove {
     grid-column: 1/-1;
     width: 40%;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 10px;
+    margin: 10px auto;
+
+}
+
+.pokemonResultMoveDiv {
+    border: 1px solid darkred;
+    border-radius: 5px;
+    background-color: #E42D3D;
+}
+
+.pokemonResultMoveSeparator {
+    background-color: white;
+    margin: 5px 0;
+    height: 1px;
+    grid-column: 1/-1;
+    width: 100%;
+}
+
+.pokemonResultMoveDiv:hover {
+    cursor: pointer;
+    border: 2px solid white;
+}
+
+.pokemonResultMoveDiv.active {
+    border: 2px solid white;
+}
+
+.pokemonResultMoveDiv:not(.active) .pokemonResultMoveDetail, .pokemonResultMoveDiv:not(.active) .pokemonResultMoveSeparator {
+    display: none;
+}
+
+.pokemonResultMoveDetail {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+    padding: 5px;
+}
+
+.pokemonResultMoveShort {
+    padding: 5px;
+}
+
+.pokemonResultMoveDetailDescription {
+    grid-column: 1/-1;
 }
 
 .low_stat {

@@ -109,11 +109,6 @@ function searchPokemon(container, pokemon, compare_part) {
             template.find('.pokemonResultStatsSpecialDefense').html(response.data.stats.find(stat => stat.stat.name === "special-defense").base_stat)
             template.find('.pokemonResultStatsSpeed').html(response.data.stats.find(stat => stat.stat.name === "speed").base_stat)
 
-            // Attaques du Pokémon
-            response.data.moves.forEach(move => {
-                template.find('.pokemonResultMoves').append(`<span>${move.move.name}</span>`)
-            })
-
             // Bouton Supprimer
             template.find('.pokemonResultRemove').on('click', () => {
                 let templateSearchPokemon = $('#TemplatePokemonSearch').html()
@@ -133,6 +128,7 @@ function searchPokemon(container, pokemon, compare_part) {
             container.html(template)
 
             actuPokemonStats()
+            setPokemonMoves(container, response.data.moves)
         }).catch((error) => {
             container.find('.error-input').html('Pokémon introuvable')
         })
@@ -205,4 +201,39 @@ function updateAStat(statClass, stat1, stat2) {
         $(`#pokemon2 ${statClass}`).addClass('same_stat')
         $(`#pokemon1 ${statClass}`).addClass('same_stat')
     }
+}
+
+function setPokemonMoves(container, moves) {
+    moves.forEach(move => {
+        let template = $($('#TemplatePokemonResultMoveDiv').html())
+        template.find('.pokemonResultMoveShortName').html(move.move.name)
+
+        template.on('click', () => {
+            if(template.hasClass('active')) {
+                template.removeClass('active')
+            }
+            else {
+                template.addClass('active')
+                if(!template.hasClass('generate')) {
+                    axios({
+                        method: 'get',
+                        url: move.move.url
+                    }).then(response => {
+                        template.find('.pokemonResultMoveDetailDescription').html(response.data.flavor_text_entries.filter(text => text.language.name === "fr").pop().flavor_text)
+                        template.find('.pokemonResultMoveDetailDamageType').html(response.data.damage_class.name)
+                        template.find('.pokemonResultMoveDetailPrecision').html(response.data.accuracy)
+                        template.find('.pokemonResultMoveDetailDamage').html((response.data.power) ? response.data.power : 0)
+                        template.find('.pokemonResultMoveDetailPP').html(response.data.pp)
+                        template.addClass('generate')
+
+                        console.log(response.data)
+                    }).catch((error) => {
+                        console.error(error)
+                    })
+                }
+            }
+        })
+
+        container.find('.pokemonResultMoves').append(template)
+    })
 }
