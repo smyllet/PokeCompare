@@ -1,33 +1,42 @@
+// - - - - - Variable - - - - - //
 let pokemonAutocomplete = []
 let poke1 = {}
 let poke2 = {}
 
+// - - - - - Exécution une fois que la page à chargé - - - - - //
 $(document).ready(() => {
-    let templateSearchPokemon = $('#TemplatePokemonSearch').html()
+    // Récupération des deux partie d'affichage
     let pokemon1 = $('#pokemon1')
     let pokemon2 = $('#pokemon2')
 
+    // Récupération du modèle des zones de recherche
+    let templateSearchPokemon = $('#TemplatePokemonSearch').html()
+
+    // Initialisation des zones de recherche
     pokemon1.html(templateSearchPokemon)
     pokemon2.html(templateSearchPokemon)
 
+    // Récupération de la liste des Pokémon pour les champs de recherche auto-complété
     getPokemonAutoComplete()
 
+    // Initialisation des évènements lié au zones de recherche
     setSearchEvent()
 
-    $('#filtreAttaques input[type=checkbox]').on('change', () => {
-        updatePokemonMoves()
-    })
-
-    $('#filtreAttaques input[type=text]').on('input', () => {
-        updatePokemonMoves()
-    })
+    // Initialisation des évènements lié au filtres
+    setFiltreEvent()
 })
 
+// Fonction d'initialisation des évènements lié au zones de recherche
 function setSearchEvent() {
+    // Récupération des deux partie d'affichage
     let pokemon1 = $('#pokemon1')
     let pokemon2 = $('#pokemon2')
 
-    $('.pokemonSearch input').typeahead({
+    // Récupération des champs de recherche
+    let searchInput = $('.pokemonSearch input')
+
+    // Initialisation de l'auto-complétion des champs de recherche
+    searchInput.typeahead({
         menu: '<ul class="typeahead dropdown-menu dropdown-menu-scroll" role="listbox"></ul>',
         item: '<li><a class="dropdown-item" href="#" role="option"></a></li>',
         autoSelect: true,
@@ -49,12 +58,13 @@ function setSearchEvent() {
     })
 
     // Retiré le focus quand la touche entré est pressé
-    $('.pokemonSearch input').on('keypress', (e) => {
+    searchInput.on('keypress', (e) => {
         if(e.which === 13) {
             $(e.currentTarget).blur()
         }
     })
 
+    // Recherché le Pokémon lorsque le focus est quitté dans la recherche
     let timeoutPk1
     $('#pokemon1 input').on('focusout', (e) => {
         clearTimeout(timeoutPk1)
@@ -63,7 +73,6 @@ function setSearchEvent() {
             searchPokemon(pokemon1, current.val(), 1)
         }, 100)
     })
-
     let timeoutPk2
     $('#pokemon2 input').on('focusout', (e) => {
         clearTimeout(timeoutPk2)
@@ -74,13 +83,33 @@ function setSearchEvent() {
     })
 }
 
+// Fonction d'initialisation des évènements lié au filtres
+function setFiltreEvent() {
+    // Mettre à jours la liste des attaques des Pokémon lorsque une case est coché ou décoché dans les filtres d'attaques
+    $('#filtreAttaques input[type=checkbox]').on('change', () => {
+        updatePokemonMoves()
+    })
+
+    // Mettre à jours la liste des attaques des Pokémon lorsque du text est entré dans les filtres d'attaques
+    $('#filtreAttaques input[type=text]').on('input', () => {
+        updatePokemonMoves()
+    })
+}
+
+// Fonction de recherche de Pokémon
 function searchPokemon(container, pokemon, compare_part) {
+    // Suppression des erreurs de recherche (si il y en a)
     container.find('.error-input').html('')
+
+    // Si il y a bien du text de saisie
     if(pokemon.length > 0) {
+        // Récupérer auprès de la pokéapi le pokémon demandé par l'utilisateur
         axios({
             method: 'get',
             url: `https://pokeapi.co/api/v2/pokemon/${pokemon}`
         }).then(response => {
+            // Si un pokémon est bien retourné
+            // Stocké les données du pokémon dans la variable correspondant à la zone de recherche
             if(compare_part === 1) {
                 poke1 = response.data
             }
@@ -88,28 +117,38 @@ function searchPokemon(container, pokemon, compare_part) {
                 poke2 = response.data
             }
 
+            // Récupération du modèle de résultat
             let template = $($('#TemplatePokemonResult').html())
+
+            // Ajout du nom du pokémon
             template.find('.pokemonResultName').html(response.data.name)
+
+            // Récupération des informations détaillé du pokémon via la poké api (nom français et description pokédex)
             axios({
                 method: 'get',
                 url: response.data.species.url
             }).then(res => {
+                // Ajout du nom français du pokémon
                 template.find('.pokemonResultName').append(` (${res.data.names.find(name => name.language.name === 'fr').name})`)
+
+                // Ajout de la description pokédex du pokémon
                 template.find('.pokemonResultText').html(res.data.flavor_text_entries.find(text => text.language.name === 'fr').flavor_text)
             })
+
+            // Récupération et ajout de la photo du Pokémon
             template.find('.pokemonResultPicture').attr('src', getPictureLink(response.data.id))
 
-            // Type du Pokémon
+            // Ajout Type du Pokémon
             response.data.types.forEach(type => {
                 template.find('.PokemonResultType').append(`<span class="${type.type.name}">${type.type.name}</span>`)
             })
 
-            // Information du Pokémon
+            // Ajout information du Pokémon
             template.find('.pokemonResultInformationBaseExperience').html(response.data.base_experience)
             template.find('.pokemonResultInformationHeight').html(response.data.height)
             template.find('.pokemonResultInformationWeight').html(response.data.weight)
 
-            // Statistique du Pokémon
+            // Ajout statistique du Pokémon
             template.find('.pokemonResultStatsHP').html(response.data.stats.find(stat => stat.stat.name === "hp").base_stat)
             template.find('.pokemonResultStatsAttack').html(response.data.stats.find(stat => stat.stat.name === "attack").base_stat)
             template.find('.pokemonResultStatsDefense').html(response.data.stats.find(stat => stat.stat.name === "defense").base_stat)
@@ -117,10 +156,12 @@ function searchPokemon(container, pokemon, compare_part) {
             template.find('.pokemonResultStatsSpecialDefense').html(response.data.stats.find(stat => stat.stat.name === "special-defense").base_stat)
             template.find('.pokemonResultStatsSpeed').html(response.data.stats.find(stat => stat.stat.name === "speed").base_stat)
 
-            // Bouton Supprimer
+            // Initialisation du bouton de suppression du pokémon
             template.find('.pokemonResultRemove').on('click', () => {
+                // Récupération du modèle des zones de recherche
                 let templateSearchPokemon = $('#TemplatePokemonSearch').html()
 
+                // Effacer les donnée lié au pokémon
                 if(compare_part === 1) {
                     poke1 = {}
                 }
@@ -128,48 +169,70 @@ function searchPokemon(container, pokemon, compare_part) {
                     poke2 = {}
                 }
 
+                // Initialisation de la zone de recherche
                 container.html(templateSearchPokemon)
+
+                // Récupération de la liste des Pokémon pour les champs de recherche auto-complété
+                getPokemonAutoComplete()
+
+                // Initialisation des évènements lié au zones de recherche
                 setSearchEvent()
-                actuPokemonStats()
+
+                // Actualisation des attaques des Pokémon
                 updatePokemonMoves()
             })
 
+            // Ajout du template du résultat dans la zone d'affichage du pokémon
             container.html(template)
 
+            // Actualisation des statistiques des Pokémon
             actuPokemonStats()
+
+            // Actualisation des attaques des Pokémon
             updatePokemonMoves()
-        }).catch((error) => {
+        }).catch(() => {
+            // En cas d'erreur, informé l'utilisateur que le Pokémon est introuvable
             container.find('.error-input').html('Pokémon introuvable')
         })
     }
 }
 
+// Fonction de récupération de l'auto-complétion
 function getPokemonAutoComplete() {
+    // Récupération de la liste des pokémon via la pokéapi
     axios({
         method: 'get',
         url: `https://pokeapi.co/api/v2/pokemon?limit=900`
     }).then(response => {
+        // Récupération de la liste des nom et ajout dans la variable d'auto complétion
         pokemonAutocomplete = response.data.results.map(pokemon => pokemon.name)
     }).catch((error) => {
         console.error(error)
     })
 }
 
+// Fonction de génération du lien de l'image d'un Pokémon
 function getPictureLink(id) {
+    // Mise sur 3 caractère du numéro de pokédex
     id = "" + id
-
     while (id.length < 3) {
         id = "0" + id
     }
 
+    // Envoie du lien pokemon.com de l'image d'un pokémon
+    // (L'image du Pokémon n'est pas récupéré via la pokéapi car de trop faible qualité)
     return `https://assets.pokemon.com/assets/cms2/img/pokedex/full/${id}.png`
 }
 
+// Actualisation de la couleur des statistiques des Pokémon
 function actuPokemonStats() {
-    $('.pokemonResultStats span').removeClass('low_stat')
-    $('.pokemonResultStats span').removeClass('hight_stat')
-    $('.pokemonResultStats span').removeClass('same_stat')
+    // Effacer les couleurs actuel des stats
+    let statSpan = $('.pokemonResultStats span')
+    statSpan.removeClass('low_stat')
+    statSpan.removeClass('hight_stat')
+    statSpan.removeClass('same_stat')
 
+    // Si les stats des deux Pokémon à comparé sont bien présente, Récupéré chaque stats et la mettre à jours
     if(poke1.stats && poke2.stats) {
         let poke1_hp = poke1.stats.find(stat => stat.stat.name === "hp").base_stat
         let poke2_hp = poke2.stats.find(stat => stat.stat.name === "hp").base_stat
@@ -197,6 +260,7 @@ function actuPokemonStats() {
     }
 }
 
+// Fonction de mise en couleur d'un statistique d'un Pokémon
 function updateAStat(statClass, stat1, stat2) {
     if(stat1 > stat2) {
         $(`#pokemon1 ${statClass}`).addClass('hight_stat')
@@ -212,56 +276,87 @@ function updateAStat(statClass, stat1, stat2) {
     }
 }
 
+// Fonction de mise à jour de l'affichage des attaques des Pokémon
 function updatePokemonMoves() {
+    // Récupération des deux partie d'affichage
     let pokemon1 = $('#pokemon1')
     let pokemon2 = $('#pokemon2')
 
+    // Si les attaques du Pokémon sont stocké, les metres à jours
     if(poke1.moves) setPokemonMoves(pokemon1, poke1.moves)
     if(poke2.moves) setPokemonMoves(pokemon2, poke2.moves)
 }
 
+// Fonction de mise à jour des attaques d'un pokémon
 function setPokemonMoves(container, moves) {
+    // Variable qui contiendra la liste des attaques filtré
     let movesFiltered
 
+    // Filtre des attaques
     movesFiltered = moves.filter(move => {
+        // Par défaut, l'attaques est valide
         let valide = true
 
+        // Récupération du filtre de recherche d'attaque
         let search = $('#filtreAttaquesSearch').val().toLowerCase()
 
+        // Si le filtre de recherche contient bien du text et que celui-ci n'est pas présent dans le nom de l'attaque, on ne valide pas l'attaque
         if((search.length > 0) && !move.move.name.toLowerCase().includes(search)) valide = false
+        // Sinon si ils y a bien les attaques pour les deux pokémon à comparer
         else if(poke1.moves && poke2.moves) {
+            // Si l'on ne souhaite pas les attaques en commune et que l'attaque ce trouve dans les deux Pokémon, on ne valide pas l'attaque
             if(!$('#filtreAttaquesSameAttack').prop('checked') && poke1.moves.find(m => m.move.name === move.move.name) && poke2.moves.find(m => m.move.name === move.move.name)) valide = false
+            // Sinon si l'on ne souhaite pas les attaques en unique à chaque pokémon et que c'est le cas, on ne valide pas l'attaque
             else if(!$('#filtreAttaquesDifAttack').prop('checked') && !(poke1.moves.find(m => m.move.name === move.move.name) && poke2.moves.find(m => m.move.name === move.move.name))) valide = false
         }
 
+        // Retourner si l'attaque correspond au critères de filtres ou non
         return valide
     })
 
+    // Effacer les attaques actuellement affiché
     container.find('.pokemonResultMoves').html('')
 
+    // Pour chaque attaques contenue dans la liste des attaques filtré
     movesFiltered.forEach(move => {
+        // Récupéré le modèle d'une attaque
         let template = $($('#TemplatePokemonResultMoveDiv').html())
+
+        // Ajout du nom
         template.find('.pokemonResultMoveShortName').html(move.move.name)
 
+        // Quand l'utilisateur click sur l'attaque
         template.on('click', () => {
+            // Si elle possède la classe active
             if(template.hasClass('active')) {
+                // Supprimer la classe active
                 template.removeClass('active')
             }
+            // Sinon
             else {
+                // Ajouter la classe active
                 template.addClass('active')
+
+                // Si le contenue n'a pas déjà été récupéré
                 if(!template.hasClass('generate')) {
+                    // Récupéré les information détaillé de l'attaque
                     axios({
                         method: 'get',
                         url: move.move.url
                     }).then(response => {
+                        // Ajout de la description
                         template.find('.pokemonResultMoveDetailDescription').html(response.data.flavor_text_entries.filter(text => text.language.name === "fr").pop().flavor_text)
+                        // Ajout du type d'attaque
                         template.find('.pokemonResultMoveDetailDamageType').html(response.data.damage_class.name)
+                        // Ajout de la précision
                         template.find('.pokemonResultMoveDetailPrecision').html(response.data.accuracy)
+                        // Ajout des dégâts
                         template.find('.pokemonResultMoveDetailDamage').html((response.data.power) ? response.data.power : 0)
+                        // Ajout du nombre de point de pouvoir
                         template.find('.pokemonResultMoveDetailPP').html(response.data.pp)
-                        template.addClass('generate')
 
-                        console.log(response.data)
+                        // Ajout de la classe generate pour ne pas re récupéré les information si l'utilisateur re click dessus
+                        template.addClass('generate')
                     }).catch((error) => {
                         console.error(error)
                     })
@@ -269,8 +364,10 @@ function setPokemonMoves(container, moves) {
             }
         })
 
+        // Ajout de l'attaque dans la liste des attaques du Pokémon
         container.find('.pokemonResultMoves').append(template)
     })
 
+    // Mise à jour du nombre d'attaques afficher sur le nombre d'attaques total pour le Pokémon
     container.find('.pokemonResultMovesNB').html(`(${movesFiltered.length}/${moves.length})`)
 }
