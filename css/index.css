@@ -69,6 +69,10 @@ main {
     text-align: center;
 }
 
+.pokemonResultName:first-letter {
+    text-transform: capitalize;
+}
+
 .pokemonSearch .form-group {
     height: min-content;
     width: 60%;
