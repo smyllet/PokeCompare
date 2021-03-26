@@ -2,6 +2,7 @@
 let pokemonAutocomplete = []
 let poke1 = {}
 let poke2 = {}
+let moveCache = {}
 
 // - - - - - Exécution une fois que la page à chargé - - - - - //
 $(document).ready(() => {
@@ -326,7 +327,7 @@ function setPokemonMoves(container, moves) {
         template.find('.pokemonResultMoveShortName').html(move.move.name)
 
         // Quand l'utilisateur click sur l'attaque
-        template.on('click', () => {
+        template.on('click', async () => {
             // Si elle possède la classe active
             if(template.hasClass('active')) {
                 // Supprimer la classe active
@@ -337,30 +338,34 @@ function setPokemonMoves(container, moves) {
                 // Ajouter la classe active
                 template.addClass('active')
 
-                // Si le contenue n'a pas déjà été récupéré
-                if(!template.hasClass('generate')) {
+                let moves;
+                // Si le contenue n'est pas en cache
+                if(!moveCache[move.move.name]) {
                     // Récupéré les information détaillé de l'attaque
-                    axios({
+                    await axios({
                         method: 'get',
                         url: move.move.url
                     }).then(response => {
-                        // Ajout de la description
-                        template.find('.pokemonResultMoveDetailDescription').html(response.data.flavor_text_entries.filter(text => text.language.name === "fr").pop().flavor_text)
-                        // Ajout du type d'attaque
-                        template.find('.pokemonResultMoveDetailDamageType').html(response.data.damage_class.name)
-                        // Ajout de la précision
-                        template.find('.pokemonResultMoveDetailPrecision').html(response.data.accuracy)
-                        // Ajout des dégâts
-                        template.find('.pokemonResultMoveDetailDamage').html((response.data.power) ? response.data.power : 0)
-                        // Ajout du nombre de point de pouvoir
-                        template.find('.pokemonResultMoveDetailPP').html(response.data.pp)
-
-                        // Ajout de la classe generate pour ne pas re récupéré les information si l'utilisateur re click dessus
-                        template.addClass('generate')
+                        moves = response.data
+                        // Mise en cache de l'attaque
+                        moveCache[move.move.name] = response.data
                     }).catch((error) => {
                         console.error(error)
                     })
                 }
+                // Sinon en récupère dans le cache
+                else moves = moveCache[move.move.name]
+
+                // Ajout de la description
+                template.find('.pokemonResultMoveDetailDescription').html(moves.flavor_text_entries.filter(text => text.language.name === "fr").pop().flavor_text)
+                // Ajout du type d'attaque
+                template.find('.pokemonResultMoveDetailDamageType').html(moves.damage_class.name)
+                // Ajout de la précision
+                template.find('.pokemonResultMoveDetailPrecision').html(moves.accuracy)
+                // Ajout des dégâts
+                template.find('.pokemonResultMoveDetailDamage').html((moves.power) ? moves.power : 0)
+                // Ajout du nombre de point de pouvoir
+                template.find('.pokemonResultMoveDetailPP').html(moves.pp)
             }
         })
 
