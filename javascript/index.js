@@ -181,6 +181,9 @@ function searchPokemon(container, pokemon, compare_part) {
 
                 // Actualisation des attaques des Pokémon
                 updatePokemonMoves()
+
+                // Actualisation des zones des Pokémon
+                updatePokemonArea()
             })
 
             // Ajout du template du résultat dans la zone d'affichage du pokémon
@@ -191,6 +194,21 @@ function searchPokemon(container, pokemon, compare_part) {
 
             // Actualisation des attaques des Pokémon
             updatePokemonMoves()
+
+            // Récupération et actualisation des zones des pokémon
+            axios({
+                method: 'get',
+                url: response.data.location_area_encounters
+            }).then(res => {
+                if(compare_part === 1) {
+                    poke1.areas = res.data
+                }
+                else if(compare_part === 2) {
+                    poke2.areas = res.data
+                }
+
+                updatePokemonArea()
+            })
         }).catch(() => {
             // En cas d'erreur, informé l'utilisateur que le Pokémon est introuvable
             container.find('.error-input').html('Pokémon introuvable')
@@ -375,4 +393,114 @@ function setPokemonMoves(container, moves) {
 
     // Mise à jour du nombre d'attaques afficher sur le nombre d'attaques total pour le Pokémon
     container.find('.pokemonResultMovesNB').html(`(${movesFiltered.length}/${moves.length})`)
+}
+
+// Fonction de mise à jour de l'affichage des zones des Pokémon
+function updatePokemonArea() {
+    // Récupération des deux partie d'affichage
+    let pokemon1 = $('#pokemon1')
+    let pokemon2 = $('#pokemon2')
+
+    // Si les zones du Pokémon sont stocké, les metres à jours
+    if(poke1.areas) setPokemonAreas(pokemon1, poke1.areas)
+    if(poke2.areas) setPokemonAreas(pokemon2, poke2.areas)
+}
+
+// Fonction de mise à jour des attaques d'un pokémon
+function setPokemonAreas(container, areas) {
+    // Récupération des deux partie d'affichage
+    let pokemon1 = $('#pokemon1')
+    let pokemon2 = $('#pokemon2')
+
+    // Effacer les attaques actuellement affiché
+    container.find('.pokemonResultArea').html('')
+
+    // Pour chaque zone contenue dans la liste des zones
+    areas.forEach(area => {
+        // Récupéré le modèle d'une zone
+        let template = $($('#TemplatePokemonResultAreaDiv').html())
+
+        // Ajout du nom
+        template.find('.pokemonResultAreaShortName').html(readableAreaName(area.location_area.name))
+
+        // Quand l'utilisateur click sur l'attaque
+        template.on('click', async () => {
+            // Si elle possède la classe active
+            if(template.hasClass('active')) {
+                // Supprimer la classe active
+                template.removeClass('active')
+            }
+            // Sinon
+            else {
+                // Ajouter la classe active
+                template.addClass('active')
+
+                template.find('.pokemonResultAreaPokemonLoadLeft').on('click', () => {
+                    loadPokemonAreaList(pokemon1, area, 1)
+                })
+
+                template.find('.pokemonResultAreaPokemonLoadRight').on('click', () => {
+                    loadPokemonAreaList(pokemon2, area, 2)
+
+                })
+            }
+        })
+
+        // Ajout de l'attaque dans la liste des attaques du Pokémon
+        container.find('.pokemonResultArea').append(template)
+    })
+
+    // Mise à jour du nombre d'attaques afficher sur le nombre d'attaques total pour le Pokémon
+    container.find('.pokemonResultAreaNB').html(`(${areas.length}/${areas.length})`)
+}
+
+// Suppression des tiret et area dans le nom des zones
+function readableAreaName(name) {
+    return name.replace('-area', ' ').replaceAll('-', ' ')
+}
+
+function loadPokemonAreaList(container, area, compare_part) {
+    // Récupération des pokémon de la zone
+    axios({
+        method: 'get',
+        url: area.location_area.url
+    }).then(res => {
+        // Récupération du modèle des zones de recherche
+        let templateAreaPokemonList = $($('#TemplateAreaPokemonList').html())
+
+        // Effacer les donnée lié au pokémon
+        if(compare_part === 1) {
+            poke1 = {}
+        }
+        else if(compare_part === 2) {
+            poke2 = {}
+        }
+
+        // Changer le nom de la zone
+        templateAreaPokemonList.find('.AreaPokemonListAreaName').html(readableAreaName(res.data.name))
+
+        console.log(res.data.pokemon_encounters)
+
+        res.data.pokemon_encounters.forEach(pokemon => {
+            let element = $(`<div>${pokemon.pokemon.name}</div>`)
+
+            element.on('click', () => {
+                searchPokemon(container, pokemon.pokemon.name, compare_part)
+            })
+
+            templateAreaPokemonList.find('.AreaPokemonListPokemons').append(element)
+        })
+
+        // Initialisation de la zone de recherche
+        container.html(templateAreaPokemonList)
+
+        // Actualisation des attaques des Pokémon
+        updatePokemonMoves()
+
+        // Actualisation des zones des Pokémon
+        updatePokemonArea()
+
+        // Actualisation des statistiques des Pokémon
+        actuPokemonStats()
+    })
 }

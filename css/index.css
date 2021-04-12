@@ -158,13 +158,13 @@ main {
     margin-right: auto;
 }
 
-.pokemonResultMoveDiv {
+.pokemonResultCard {
     border: 1px solid darkred;
     border-radius: 5px;
     background-color: #E42D3D;
 }
 
-.pokemonResultMoveSeparator {
+.pokemonResultCardSeparator {
     background-color: white;
     margin: 5px 0;
     height: 1px;
@@ -172,16 +172,16 @@ main {
     width: 100%;
 }
 
-.pokemonResultMoveDiv:hover {
+.pokemonResultCard:hover {
     cursor: pointer;
     border: 2px solid white;
 }
 
-.pokemonResultMoveDiv.active {
+.pokemonResultCard.active {
     border: 2px solid white;
 }
 
-.pokemonResultMoveDiv:not(.active) .pokemonResultMoveDetail, .pokemonResultMoveDiv:not(.active) .pokemonResultMoveSeparator {
+.pokemonResultCard:not(.active) .pokemonResultCardDetail, .pokemonResultCard:not(.active) .pokemonResultCardSeparator {
     display: none;
 }
 
@@ -192,7 +192,7 @@ main {
     padding: 5px;
 }
 
-.pokemonResultMoveShort {
+.pokemonResultCardShort {
     padding: 5px;
 }
 
@@ -210,6 +210,73 @@ main {
 
 .same_stat {
     color: #244C9C;
+}
+
+/* Area */
+.pokemonResultZoneDiv {
+    grid-column: 1/-1;
+}
+
+.pokemonResultArea {
+    display: grid;
+    height: 20vh;
+    overflow-y: auto;
+    grid-auto-rows: min-content;
+    gap: 5px;
+}
+
+.pokemonResultAreaNB {
+    text-decoration: initial;
+    font-weight: normal;
+    font-size: large;
+    float: right;
+}
+
+.pokemonResultAreaDetail {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+    padding: 5px;
+}
+
+.pokemonResultAreaDetail > span {
+    grid-column: 1/-1;
+    text-align: center;
+}
+
+/* Area Pokemon List */
+.AreaPokemonList {
+    padding: 15px;
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+}
+
+.AreaPokemonList hr {
+    background-color: white;
+    margin: 5px auto;
+    height: 1px;
+    grid-column: 1/-1;
+    width: 90%;
+}
+
+.AreaPokemonListPokemons {
+    display: grid;
+    gap: 5px;
+    width: 40vw;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.AreaPokemonListPokemons > * {
+    border: 1px solid darkred;
+    border-radius: 5px;
+    background-color: #E42D3D;
+    padding: 5px;
+}
+
+.AreaPokemonListPokemons > *:hover {
+    cursor: pointer;
+    border: 2px solid white;
 }
 
 /* Filtres */

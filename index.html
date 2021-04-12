@@ -92,22 +92,49 @@
             <div class="pokemonResultMoves pokemonResultDataContainer">
             </div>
         </div>
+        <div class="pokemonResultZoneDiv">
+            <h4>Zones <span class="pokemonResultAreaNB"></span></h4>
+            <div class="pokemonResultArea pokemonResultDataContainer">
+            </div>
+        </div>
         <button type="button" class="btn btn-danger pokemonResultRemove">Supprimer</button>
     </div>
 </template>
 <template id="TemplatePokemonResultMoveDiv">
-    <div class="pokemonResultMoveDiv">
-        <div class="pokemonResultMoveShort">
+    <div class="pokemonResultMoveDiv pokemonResultCard">
+        <div class="pokemonResultMoveShort pokemonResultCardShort">
             <span class="pokemonResultMoveShortName"></span>
         </div>
-        <hr class="pokemonResultMoveSeparator">
-        <div class="pokemonResultMoveDetail">
+        <hr class="pokemonResultCardSeparator">
+        <div class="pokemonResultMoveDetail pokemonResultCardDetail">
             <span class="pokemonResultMoveDetailDescription"></span>
             <span>Type d'attaque : <span class="pokemonResultMoveDetailDamageType"></span></span>
             <span>Précision : <span class="pokemonResultMoveDetailPrecision"></span></span>
             <span>Dégâts : <span class="pokemonResultMoveDetailDamage"></span></span>
             <span>Points de pouvoir : <span class="pokemonResultMoveDetailPP"></span></span>
         </div>
+    </div>
+</template>
+<template id="TemplatePokemonResultAreaDiv">
+    <div class="pokemonResultAreaDiv pokemonResultCard">
+        <div class="pokemonResultAreaShort pokemonResultCardShort">
+            <span class="pokemonResultAreaShortName"></span>
+        </div>
+        <hr class="pokemonResultCardSeparator">
+        <div class="pokemonResultAreaDetail pokemonResultCardDetail">
+            <span>Chargé la liste des pokémon de cette zone à</span>
+            <button class="pokemonResultAreaPokemonLoadLeft btn btn-light">Gauche</button>
+            <button class="pokemonResultAreaPokemonLoadRight btn btn-light">Droite</button>
+        </div>
+    </div>
+</template>
+<template id="TemplateAreaPokemonList">
+    <div class="AreaPokemonList">
+        <h4>Pokémon de la zone : <span class="AreaPokemonListAreaName"></span></h4>
+        <hr>
+        <div class="AreaPokemonListPokemons"></div>
+        <hr>
+        <button class="btn btn-danger">Retour à la recherche classique</button>
     </div>
 </template>
 </html>
