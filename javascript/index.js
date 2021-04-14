@@ -479,8 +479,6 @@ function loadPokemonAreaList(container, area, compare_part) {
         // Changer le nom de la zone
         templateAreaPokemonList.find('.AreaPokemonListAreaName').html(readableAreaName(res.data.name))
 
-        console.log(res.data.pokemon_encounters)
-
         res.data.pokemon_encounters.forEach(pokemon => {
             let element = $(`<div>${pokemon.pokemon.name}</div>`)
 
@@ -489,6 +487,21 @@ function loadPokemonAreaList(container, area, compare_part) {
             })
 
             templateAreaPokemonList.find('.AreaPokemonListPokemons').append(element)
+        })
+
+        // Bouton de retour en recherche classique
+        templateAreaPokemonList.find('.AreaPokemonListReturnToSearch').on('click', () => {
+            // Récupération du modèle des zones de recherche
+            let templateSearchPokemon = $('#TemplatePokemonSearch').html()
+
+            // Initialisation de la zone de recherche
+            container.html(templateSearchPokemon)
+
+            // Récupération de la liste des Pokémon pour les champs de recherche auto-complété
+            getPokemonAutoComplete()
+
+            // Initialisation des évènements lié au zones de recherche
+            setSearchEvent()
         })
 
         // Initialisation de la zone de recherche
